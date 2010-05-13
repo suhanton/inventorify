@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 1); 
-error_reporting(E_ALL);
 	/* Libraries */
 	include('lib/session.lib.php');
 	include('lib/config.lib.php');
