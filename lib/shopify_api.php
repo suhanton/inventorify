@@ -3,7 +3,7 @@
 	Shopify PHP API
 	Created: May 4th, 2010
 	Modified: May 13th, 2010
-	Version: 1.20100513.4
+	Version: 1.20100513.5
 */
 	//this function is just to make the code a little cleaner
 	function isEmpty($string){
@@ -155,13 +155,13 @@
 			if ($article_id == 0){
 				if (!$cache){
 					$params = url_encode_array($params);
-					$this->array = organizeArray(sendToAPI($this->prefix . $blog_id . '/articles.xml?' . $params), 'article');
+					$this->array = organizeArray(sendToAPI($this->prefix . $blog_id . '/articles" . FORMAT . "?' . $params), 'article');
 				}
 			
 				return $this->array['article'];
 			}else{
 				if (!$cache){
-					$temp = sendToAPI($this->prefix . $blog_id . '/articles/' . $article_id . '.xml');
+					$temp = sendToAPI($this->prefix . $blog_id . '/articles/' . $article_id . FORMAT);
 					$this->array['article'][$article_id] = $temp;
 				}			
 				if (!isset($this->array['article'][$article_id])) throw new Exception("Article is not in cache. Set cache to false.");
@@ -171,7 +171,7 @@
 		
 		public function count($blog_id, $params = array()){
 			$params = url_encode_array($params);
-			return sendToAPI($this->prefix . $blog_id . '/articles/count.xml?' . $params);
+			return sendToAPI($this->prefix . $blog_id . '/articles/count" . FORMAT "?' . $params);
 		}
 		
 		public function create($blog_id, $fields){
@@ -748,7 +748,7 @@
 			if ($id == 0){
 				if (!$cache){
 					$params = url_encode_array($params);
-					$xmlObj = ($collection_id > 0) ? sendToAPI($this->prefix . "products.xml?collection_id=" . $collection_id . "&" . $params) : sendToAPI($this->prefix . "products" . FORMAT . "?" . $params);
+					$xmlObj = ($collection_id > 0) ? sendToAPI($this->prefix . "products" . FORMAT . "?collection_id=" . $collection_id . "&" . $params) : sendToAPI($this->prefix . "products" . FORMAT . "?" . $params);
 					$this->array = organizeArray($xmlObj, 'product');
 				}			
 				return $this->array['product'];
@@ -764,7 +764,7 @@
 		
 		public function count($collection_id = 0, $params = array()){
 			$params = url_encode_array($params);
-			return ($collection_id > 0) ? sendToAPI($this->prefix . "products/count.xml?collection_id=" . $collection_id . "&" . $params) : sendToAPI($this->prefix . "products/count" . FORMAT . "?" . $params);
+			return ($collection_id > 0) ? sendToAPI($this->prefix . "products/count" . FORMAT . "?collection_id=" . $collection_id . "&" . $params) : sendToAPI($this->prefix . "products/count" . FORMAT . "?" . $params);
 		}
 				
 		public function create($fields){
@@ -852,7 +852,7 @@
 		}
 		
 		public function remove($product_id, $id){
-			return sendToAPI($this->prefix . $product_id . "/variants/" . $id . "xml", 'DELETE', SUCCESS);
+			return sendToAPI($this->prefix . $product_id . "/variants/" . $id . FORMAT, 'DELETE', SUCCESS);
 		}
 		
 		public function __destruct(){
