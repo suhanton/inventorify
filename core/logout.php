@@ -1,4 +1,5 @@
 <?php
 	session_destroy();
-	header("Location: http://" . $api->shop->shop['domain']);
+	$shop = $api->shop->get();
+	header("Location: http://" . $shop['domain']);
 ?>

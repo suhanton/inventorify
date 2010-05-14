@@ -18,9 +18,15 @@
 			$signature = mysql_escape_string($_GET['signature']);
 			if ($db->query("INSERT INTO authorized_shops (shop, token, signature) VALUES ('$url', '$token', '$signature')", __LINE__)){
 				$_SESSION['shop_id'] = $db->id();
-				header("Location: index.php");
+				if (isset($_SESSION['nextAction'])){
+					$nextAction = $_SESSION['nextAction'];
+					unset($_SESSION['nextAction']);					
+					header("Location: index.php?action=" . $nextAction);
+				}else{
+					header("Location: index.php");
+				}
 			}else{
-				header("Location: index.php?page=error");
+				header("Location: index.php?action=error");
 			}
 		}else{		
 			$result = $db->fetch($result);
@@ -30,10 +36,11 @@
 	}else{
 		if (isset($_GET['shop'])){
 			$url = $_GET['shop'];
+			$_SESSION['nextAction'] = (isset($_GET['action'])) ? $_GET['action'] : 'inventory';
 			$api = new Session($url, '', API_KEY, SECRET);
 			header("Location: " . $api->create_permission_url());
 		}else{
-			header("Location: index.php?page=authorize");
+			header("Location: index.php?action=authorize");
 		}
 	}
 ?>

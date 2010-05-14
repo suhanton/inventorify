@@ -4,13 +4,35 @@
 	$variants = $api->product_variant;
 	$smart = $api->smart_collection;
 	$custom = $api->custom_collection;
+	$metafields = $api->metafield;
 	$errorUpdating = false;
 	
 	$productParams = array();
 	$search = 0;
 	$productName = '';
 	$collection = '';
-	$perPage = (isset($_POST['perPage']) && is_numeric($_POST['perPage'])) ? $_POST['perPage'] : 25; 
+	
+	if (sizeof($metafields->get()) == 0){
+		$metafields->create(0, array(
+									'namespace'=> 'preferences',
+									'key' => 'perPage',
+									'value' => '25', 
+									'value-type' => 'integer'
+								)
+							);
+		
+		$perPage = 25;
+	}else{
+		if (isset($_POST['perPage']) && is_numeric($_POST['perPage'])){
+			$perPage = $_POST['perPage'];
+		}else{		
+			foreach($metafields->get() as $k => $v){
+				if ($v['key'] == "perPage"){
+					$perPage = $v['value'];
+				}
+			}
+		}
+	}
 	
 	//Check the search parameters
 	if (isset($_POST['search'])){

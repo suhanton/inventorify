@@ -89,8 +89,6 @@
 <div id="flasherrors" style="display:none;"></div>
 
 <script type="text/javascript" language="javascript">
-	{JAVASCRIPT_INCLUDE}
-
 	$(document).ready(function(){
 		{JAVASCRIPT}
 	});

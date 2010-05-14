@@ -6,6 +6,7 @@
 	<title>{T_TITLE}</title>
 	<link href="{DOMAIN}/css/css.css" media="screen" rel="stylesheet" type="text/css" /> 
 	<script src="{DOMAIN}/js/jquery.js" type="text/javascript" language="javascript"></script>
+	<script src="{DOMAIN}/js/js.js" type="text/javascript" language="javascript"></script>
 </head>
 <body>
 	<div id="header"> 
