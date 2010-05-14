@@ -2,6 +2,15 @@ Make sure to set your API_KEY and SECRET in lib/shopify_api_config.php
 
 CHANGELOG
 
+1.20100514.3
+- Added a preferences page example using Metafields
+- Updated the inventory page to use the preferences
+- Updated the login page to account for navigating to preferences from shops
+- Changed the logout page to reflect changes made to the API
+
+1.20100514.2
+- API was updated to that of the latest version found at github.com/williamlang/shopify_php_api
+
 1.20100514.1
 
 - API was updated to that of the latest version found at github.com/williamlang/shopify_php_api
