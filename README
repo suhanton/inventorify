@@ -1,1 +1,9 @@
 Make sure to set your API_KEY and SECRET in lib/shopify_api_config.php
+
+CHANGELOG
+
+1.20100514.1
+
+- API was updated to that of the latest version found at github.com/williamlang/shopify_php_api
+- inventory.php, inventory.tpl, and inventory.js were updated to change from 'Manage' and 'Unmanage' buttons to Checkboxes 
+for managing inventory.

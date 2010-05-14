@@ -53,11 +53,12 @@
 <form method="post" action="index.php?action=inventory&amp;page={PAGE}" id="product_form">
 {PRODUCT}
 	<tr class="alt">
-		<th style="text-align:left;" colspan="2">{PRODUCT_title}</th>
+		<th style="text-align:left;" colspan="3">{PRODUCT_title}</th>
 	</tr>
 	<tr class="alt">
 		<th style="text-align:left;width:50%;">SKU</th>
-		<th style="text-align:left;width:50%;">Inventory</th>
+		<th style="text-align:left;width:25%;">Inventory</th>
+		<th style="text-align:left;width:25%;">Manage</th>
 	</tr>
 	{VARIANT_{PRODUCT_id}}
 	<tr>
@@ -65,9 +66,10 @@
 			<input type="text" id="variant_{VARIANT_{PRODUCT_id}_id}_sku" name="variant_{VARIANT_{PRODUCT_id}_id}_sku" value="{VARIANT_{PRODUCT_id}_sku}">
 		</td>
 		<td>
-			<input type="text" id="variant_{VARIANT_{PRODUCT_id}_id}_quantity" name="variant_{VARIANT_{PRODUCT_id}_id}_quantity" value="{VARIANT_{PRODUCT_id}_inventory-quantity}" size="4" style="display:{VARIANT_{PRODUCT_id}_display_quantity};" />
-			<input type="button" id="variant_{VARIANT_{PRODUCT_id}_id}_manage_button" value="{VARIANT_{PRODUCT_id}_manage_text}" onclick="Javascript:manageVariant({VARIANT_{PRODUCT_id}_id});">
-			<input type="hidden" id="variant_{VARIANT_{PRODUCT_id}_id}_management" name="variant_{VARIANT_{PRODUCT_id}_id}_management" value="{VARIANT_{PRODUCT_id}_inventory-management}">
+			<input type="text" id="variant_{VARIANT_{PRODUCT_id}_id}_quantity" name="variant_{VARIANT_{PRODUCT_id}_id}_quantity" value="{VARIANT_{PRODUCT_id}_inventory-quantity}" size="4" {VARIANT_{PRODUCT_id}_disabled} />
+		</td>
+		<td>
+			<input type="checkbox" id="variant_{VARIANT_{PRODUCT_id}_id}_management" name="variant_{VARIANT_{PRODUCT_id}_id}_management" onclick="Javascript:manageVariant({VARIANT_{PRODUCT_id}_id});" {VARIANT_{PRODUCT_id}_checked}>
 		</td>
 	</tr>
 	{/VARIANT_{PRODUCT_id}}

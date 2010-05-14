@@ -13,16 +13,12 @@ function showErrors(message){
 }
 
 function manageVariant(variant_id){
-	var currentManagement = $('#variant_' + variant_id + '_management').val();
+	var currentManagement = $('#variant_' + variant_id + '_management:checked').val()
 	
-	if (currentManagement == ""){
-		$('#variant_' + variant_id + '_quantity').css('display', 'inline');
-		$('#variant_' + variant_id + '_manage_button').val('Unmanage');
-		$('#variant_' + variant_id + '_management').val('shopify');
+	if (currentManagement == null){
+		$('#variant_' + variant_id + '_quantity').attr('disabled', 'disabled');
 	}else{
-		$('#variant_' + variant_id + '_quantity').css('display', 'none');
-		$('#variant_' + variant_id + '_manage_button').val('Manage');
-		$('#variant_' + variant_id + '_management').val('');		
+		$('#variant_' + variant_id + '_quantity').removeAttr('disabled');
 	}
 }
 

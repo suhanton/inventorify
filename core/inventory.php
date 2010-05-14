@@ -28,7 +28,7 @@
 	//pagination setup
 	$page = (isset($_GET['page'])) ? $_GET['page'] : 1;
 	if (!is_numeric($page)) $page = 1;
-	$totalPages = ceil($products->count($productParams) / $perPage);
+	$totalPages = ceil($products->count(0, $productParams) / $perPage);
 
 	$tagArray = array(
 		'PAGE' => $page,
@@ -87,9 +87,9 @@
 			//cycle variants from the products
 			foreach($variants->get($v['id']) as $vk => $vv){
 				$fields = array();
-				$newQuantity = $_POST['variant_' . $vv['id'] . '_quantity'];
+				$newQuantity = (isset($_POST['variant_' . $vv['id'] . '_quantity'])) ? $_POST['variant_' . $vv['id'] . '_quantity'] : '';
 				$newSKU = $_POST['variant_' . $vv['id'] . '_sku'];
-				$newManagement = $_POST['variant_' . $vv['id'] . '_management'];
+				$newManagement = (isset($_POST['variant_' . $vv['id'] . '_management']) &&  $_POST['variant_' . $vv['id'] . '_management'] == "on") ? 'shopify' : '';
 				$fields = array('sku' => $newSKU, 'inventory-management' => $newManagement);
 				if (is_numeric($newQuantity) && $newManagement == 'shopify') $fields['inventory-quantity'] = $newQuantity;
 				if (!is_array($variants->modify($v['id'], $vv['id'], $fields))) $errorUpdating = true;
@@ -140,12 +140,8 @@
 			foreach($variants->get($v['id']) as $vk => $vv){
 				$vr = sizeof($loopArray[$variantKey]);
 				foreach($vv as $vvk => $vvv) $loopArray[$variantKey][$vr][$vvk] = $vvv;
-				if (isset($vv['inventory-management'])){
-					$loopArray[$variantKey][$vr]['display_quantity'] = ($vv['inventory-management'] == "shopify") ? 'inline' : 'none';			
-				} else{
-					$loopArray[$variantKey][$vr]['display_quantity'] = 'none';
-				}
-				$loopArray[$variantKey][$vr]['manage_text'] = ($vv['inventory-management'] == "") ? 'Manage' : 'Unmanage';
+				$loopArray[$variantKey][$vr]['checked'] = ($vv['inventory-management'] == "shopify") ? 'checked="checked"' : '';
+				$loopArray[$variantKey][$vr]['disabled'] = ($vv['inventory-management'] == "shopify") ? '' : 'disabled="disabled"';
 			}			
 		}
 	}
