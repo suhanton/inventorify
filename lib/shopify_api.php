@@ -2,8 +2,8 @@
 /*
 	Shopify PHP API
 	Created: May 4th, 2010
-	Modified: May 14th, 2010
-	Version: 1.20100514.2
+	Modified: May 19th, 2010
+	Version: 1.20100519.1
 */
 	//this function is just to make the code a little cleaner
 	function isEmpty($string){
@@ -88,7 +88,7 @@
 	}
 	
 	function gzdecode($data){
-		$g = tempnam('/tmp','ff');
+		$g = tempnam('/tmp', 'ff');
 		@file_put_contents($g, $data);
 		ob_start();
 		readgzfile($g);
@@ -106,7 +106,7 @@
 		}
 		
 		public function get($cache = false){
-			if (!$cache || !isset($this->array['record']) == 0) $this->array = organizeArray(sendToAPI($this->prefix), 'record');
+			if (!$cache || !isset($this->array['record'])) $this->array = organizeArray(sendToAPI($this->prefix), 'record');
 			return $this->array['record'];
 		}
 		
@@ -386,7 +386,7 @@
 								$collect = $temp['collect'][0];
 							}
 						}else{
-							throw new Exception("Must specify a collect id or product_id and collection_id.");										
+							throw new Exception("Must specify a collect id or product_id and collection_id in the params array if trying to fetch a specific Collect.");										
 						}
 					}
 				}
@@ -895,7 +895,7 @@
 		
 		public function get($country_id, $id = 0, $cache = false){
 			if ($id == 0){
-				if (!$cache || !isset($this->array['province'])) $this->array = organizeArray(sendToAPI($this->prefix . $country_id . "/provinces"), 'pronvince');
+				if (!$cache || !isset($this->array['province'])) $this->array = organizeArray(sendToAPI($this->prefix . $country_id . "/provinces"), 'province');
 				return $this->array['province'];
 			}else{
 				if (!$cache || !isset($this->array['province'][$id])){
