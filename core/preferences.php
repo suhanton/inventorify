@@ -1,7 +1,7 @@
 <?php
 	
 	/*
-		I am using Metafields for the preferences page instead of the database in case you do not have database
+		I am using Metafields for the preferences page instead of a database in case you do not have database
 		access to save data.	
 	*/	
 	

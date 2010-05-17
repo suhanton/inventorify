@@ -2,7 +2,6 @@
 	/* Libraries */
 	include('lib/session.lib.php');
 	include('lib/config.lib.php');
-	include('lib/database.lib.php');
 	include('lib/template.lib.php');
 	if (!file_exists('lib/shopify_api_config.php')) die('lib/shopify_api_config.php is missing!');
 	include('lib/shopify_api_config.php');
@@ -10,26 +9,13 @@
 	if (!defined('API_KEY') || !defined('SECRET') || isEmpty(API_KEY) || isEmpty(SECRET)) die('Both constants API_KEY and SECRET must be defined in the config file.');
 	/* End Libraries */
 
-	$db = new mysqlConn();
 	$action = (isset($_GET['action'])) ? $_GET['action'] : 'inventory';
 	
-	if (isset($_SESSION['shop_id'])){
-		$id = $_SESSION['shop_id'];
-		if (is_numeric($id) && $id > 0){
-			$result = $db->query("SELECT * FROM authorized_shops WHERE id = $id", __LINE__);
-			if ($db->rows($result) > 0){
-				$result = $db->fetch($result);
-				$url = $result['shop'];
-				$token = $result['token'];
-				$signature = $result['signature'];
-			}else{
-				unset($_SESSION['shop_id']);
-				$action = "authorize";
-			}
-		}else{
-			unset($_SESSION['shop_id']);
-			$action = "authorize";
-		}
+	if (isset($_SESSION['url'])){
+		$url = $_SESSION['url'];
+		$token = $_SESSION['token'];
+		$signature = $_SESSION['signature'];
+		$timestamp = $_SESSION['timestamp'];
 	}else{
 		$action = "authorize";
 	}
@@ -39,7 +25,7 @@
 	
 	if (!file_exists('core/' . $action . '.php') || !file_exists('templates/' . $action . '.tpl')) $action = "error";
 	
-	if (isset($_SESSION['shop_id'])){
+	if (isset($_SESSION['token'])){
 		$api = new Session($url, $token, API_KEY, SECRET);
 		if (!$api->valid()) $action = "error";
 	}

@@ -1,5 +1,8 @@
 Make sure to set your API_KEY and SECRET in lib/shopify_api_config.php
 
+This example app includes a basic MVC (model view controller) architecture. If you are just looking for an example of the API
+refer to core/inventory.php and core/preferences.php
+
 CHANGELOG
 
 1.20100514.3

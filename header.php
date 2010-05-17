@@ -8,9 +8,10 @@
 	$loopArray['LI'] = array();
 		
 	/* You can tab links here */	
-	if (isset($_SESSION['shop_id'])){
+	if (isset($_SESSION['url'])){
 		$links = array(
 			'Inventory' => 'inventory',
+			'Preferences' => 'preferences',
 			'Logout' => 'logout',
 			'Return to My Store' => 'http://' . $url,
 		);
