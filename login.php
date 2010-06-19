@@ -7,7 +7,7 @@
 	if (!defined('API_KEY') || !defined('SECRET') || isEmpty(API_KEY) || isEmpty(SECRET)) die('Both constants API_KEY and SECRET must be defined in the config file.');
 	
 	if (isset($_SESSION['url'])){
-    $action = (isset($_GET['action'])) ? $_GET['action'] : 'inventory';
+    $action = (isset($_GET['action'])) ? $_GET['action'] : DEFAULT_ACTION;
     header("Location: index.php?action=" . $action);
 	}else{
 	  if (isset($_GET['shop'])){
@@ -26,11 +26,12 @@
     		}	      
 	    }else{
   			$url = $_GET['shop'];
-  			$_SESSION['nextAction'] = (isset($_GET['action'])) ? $_GET['action'] : 'inventory';
+  			$_SESSION['nextAction'] = (isset($_GET['action'])) ? $_GET['action'] : DEFAULT_ACTION;
   			$api = new Session($url, '', API_KEY, SECRET);
   			header("Location: " . $api->create_permission_url());
 	    }
 	  }else{
+	    if (isset($_GET['action'])) $_SESSION['nextAction'] = $_GET['action'];
       header("Location: index.php?action=authorize");	    
 	  }
 	}

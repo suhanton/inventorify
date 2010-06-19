@@ -12,6 +12,11 @@
 	$productName = '';
 	$collection = '';
 	
+	/*
+		Get shop preferences (in metafields)
+		
+		If they don't have any preferences, create the default metafields
+	*/
 	if (sizeof($metafields->get()) == 0){
 		$metafields->create(0, array(
 									'namespace'=> 'preferences',
@@ -88,6 +93,7 @@
 		}
 	}
 	
+	//set up the loop for how many products to be displayed per page
 	$pageOptions = array(10, 25, 50, 100, 200, 250);
 	foreach($pageOptions as $i => $v){
 		$loopArray['PER_PAGE'][$i]['val'] = $v;

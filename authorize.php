@@ -8,7 +8,7 @@
 		$api = new Session($_POST['shop'], '', API_KEY, SECRET);
 		header("Location: " . $api->create_permission_url());
 	}else{
-    $action = (isset($_SESSION['nextAction'])) ? $_SESSION['nextAction'] : 'inventory';
+    $action = (isset($_SESSION['nextAction'])) ? $_SESSION['nextAction'] : DEFAULT_ACTION;
 		header("Location: index.php?action=" . $action);
 	}
 ?>
