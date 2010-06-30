@@ -1,10 +1,13 @@
 <?php
 /*
-	Shopify PHP API
+	Shopify API in PHP
 	Created: May 4th, 2010
-	Modified: May 17th, 2010
-	Version: 1.20100517.2
+	Modified: June 29th, 2010
+	Version: 1.20100629.1
 */
+
+  include('shopify_api_config.php');
+
 	//this function is just to make the code a little cleaner
 	function isEmpty($string){
 		return (strlen(trim($string)) == 0);
@@ -14,7 +17,7 @@
 	function url_encode_array($params){
 		$string = '';
 		if (sizeof($params) > 0){
-			foreach($params as $k => $v) if (!is_array($v)) $string .= $k.'='.$v.'&';
+			foreach($params as $k => $v) if (!is_array($v)) $string .= $k.'='.str_replace(' ', '%20', $v).'&';
 			$string = substr($string, 0, strlen($string) - 1);
 		}
 		return $string;
@@ -71,13 +74,13 @@
 			if (substr_count($url, '?') > 0){
 				$url = str_replace('?', '.' . FORMAT . '?', $url);
 			}else{
-				$url = $url . '.' . FORMAT;
+				$url .= '.' . FORMAT;
 			}
 		}else{
 			if (substr_count($url, '?') > 0){
 				$url = str_replace('?', '.xml?', $url);
 			}else{
-				$url = $url . '.xml';
+				$url .= '.xml';
 			}
 		}
 
@@ -88,7 +91,7 @@
 	}
 	
 	function gzdecode($data){
-		$g = tempnam('/tmp', 'ff');
+		$g = tempnam(GZIP_PATH, 'ff');
 		@file_put_contents($g, $data);
 		ob_start();
 		readgzfile($g);
@@ -404,7 +407,7 @@
 		}
 		
 		public function remove($id){
-			return sendToAPI($this->prefix . "custom_collections", 'POST', CREATED);
+			return sendToAPI($this->prefix . "custom_collections", 'DELETE');
 		}
 					
 		public function __destruct(){
@@ -502,7 +505,7 @@
 		}
 		
 		public function remove($id){
-			return sendToAPI($this->prefix . "countries/" . $id, 'DELETE', $fields);
+			return sendToAPI($this->prefix . "countries/" . $id, 'DELETE');
 		}
 		
 		public function __destruct(){
@@ -657,7 +660,6 @@
 		
 		public function __construct($site){
 			$this->prefix = $site . $this->prefix;
-			$metafield = new Metafield($site, "orders");
 		}
 		
 		public function get($id = 0, $params = array(), $cache = false){
@@ -698,11 +700,14 @@
 			$fields = array('order' => array('id' => $id, 'note-attributes' => array('note-attribute' => $fields)));
 			return sendToAPI($this->prefix . "orders/" . $id, 'PUT', $fields);
 		}
+		
+		public function remove($id){
+		  return sendToAPI($this->prefix . "orders/" . $id, 'DELETE');
+		}
 			
 		public function __destruct(){
 			unset($this->prefix);
 			unset($this->array);
-			unset($this->metafield);
 		}
 	}
 	
@@ -1083,7 +1088,7 @@
 		public function get($id = 0, $params = array(), $cache = false){
 			if ($id == 0){
 				if (!$cache || !isset($this->array['webhook'])) $this->array = organizeArray(sendToAPI($this->prefix . "webhooks?" . $params), 'webhook');
-				return $this->array['webhok'];
+				return $this->array['webhook'];
 			}else{
 				if (!$cache || !isset($this->array['webhook'][$id])){
 					$temp = sendToAPI($this->prefix . "webhooks/" . $id);
@@ -1094,8 +1099,8 @@
 		}
 		
 		public function count($params = array()){
-			$xmlObj = new parser($this->prefix . "webhooks/count?" . $params);
-			return $xmlObj->resultArray();
+		  $params = url_encode_array($params);
+		  return sendToAPI($this->prefix . "webhooks/count?" . $params);
 		}
 		
 		public function create($fields){
@@ -1122,6 +1127,7 @@
 		private $api_key;
 		private $secret;
 		private $protocol = 'https';
+		private $private = false;
 		
 		private $url;
 		private $token;
@@ -1155,11 +1161,12 @@
 			BEGIN PUBLIC
 		*/
 		
-		public function __construct($url, $token = '', $api_key, $secret, $params = array()){
+		public function __construct($url, $token = '', $api_key, $secret, $private = false, $params = array()){
 			$this->url = $url;
 			$this->token = (isEmpty($token)) ? $url : $token;
 			$this->api_key = $api_key;
 			$this->secret = $secret;
+			$this->private = $private;
 			if (isset($params['signature'])){
 				$timestamp = $params['timestamp'];
 				$expireTime = time() - (24 * 86400);
@@ -1248,7 +1255,7 @@
 		*/
 		
 		private function computed_password(){
-			return md5($this->secret . $this->token);
+			return ($this->private) ? $this->secret : md5($this->secret . $this->token);
 		}
 		
 		private function prepare_url($url){
@@ -1285,16 +1292,20 @@
 			if (!function_exists('curl_init')) die("Error: cURL does not exist! Please install cURL.");
 		}
 		
-		public function send($url, $request = 'GET', $xml_payload = '', $headers = array('Accept-Encoding: gzip')){
+		public function send($url, $request = 'GET', $xml_payload = '', $headers = array()){
 			$this->ch = curl_init($url);
-		
-			// _HEADER _RETURNTRANSFER -- Return output as string including HEADER information
+			
+			if (GZIP_ENABLED) $headers[] = 'Accept-Encoding: gzip';
+			
 			$options = array(
 				CURLOPT_HEADER => 0,
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_CUSTOMREQUEST => $request,
+				CURLOPT_SSL_VERIFYPEER => USE_SSL,
 				CURLOPT_HTTPHEADER => $headers
 			);
+			
+			if (USE_SSL_PEM) $options[CURLOPT_CAINFO] = CA_FILE;
 			
 			if ($request != "GET"){ 
 				$options[CURLOPT_POSTFIELDS] = $xml_payload; 
@@ -1302,8 +1313,8 @@
 			}
 			
 			curl_setopt_array($this->ch, $options);
-			curl_exec($this->ch);
-			$data = ($headers[0] != "Accept-Encoding: gzip") ? curl_multi_getcontent($this->ch) : gzdecode(curl_multi_getcontent($this->ch));
+			if (!curl_exec($this->ch)) die(curl_error($this->ch));
+			$data = (!GZIP_ENABLED) ? curl_multi_getcontent($this->ch) : gzdecode(curl_multi_getcontent($this->ch));
 			$code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
 			curl_close($this->ch);
 			
@@ -1326,37 +1337,38 @@
 			return $array;
 		}
 		
-		public function recurseXML($xml, &$array){ 
-	        $children = $xml->children(); 
-	        $executed = false;
+    public function recurseXML($xml, &$array){ 
+      $children = $xml->children(); 
+      $executed = false;
 
-	        foreach ($children as $k => $v){ 
-				if (is_array($array)){
-	            	if (array_key_exists($k , $array)){ 		
-	                	if (array_key_exists(0 ,$array[$k])){ 
-	                    	$i = count($array[$k]); 
-	                    	$this->recurseXML($v, $array[$k][$i]);     
-	                	}else{ 
-	                    	$tmp = $array[$k]; 
-	                    	$array[$k] = array(); 
-	                    	$array[$k][0] = $tmp; 
-	                    	$i = count($array[$k]); 
-	                    	$this->recurseXML($v, $array[$k][$i]); 
-	                	} 
-	            	}else{ 
-	                	$array[$k] = array(); 
-	                	$this->recurseXML($v, $array[$k]);    
-	            	}
+      foreach ($children as $k => $v){ 
+		    if (is_array($array)){
+      	  if (array_key_exists($k , $array)){ 		
+	        	if (array_key_exists(0 ,$array[$k])){ 
+	          	$i = count($array[$k]); 
+	          	$this->recurseXML($v, $array[$k][$i]);     
+	        	}else{ 
+	            $tmp = $array[$k]; 
+	            $array[$k] = array(); 
+	            $array[$k][0] = $tmp; 
+	            $i = count($array[$k]); 
+	            $this->recurseXML($v, $array[$k][$i]); 
+	          } 
+	        }else{ 
+	        	$array[$k] = array(); 
+	        	$this->recurseXML($v, $array[$k]);    
+	        }
 				}else{
 					$array[$k] = array(); 
-                	$this->recurseXML($v, $array[$k]);
+        	$this->recurseXML($v, $array[$k]);
 				} 
-				$executed = true; 
-	        } 
-	
-	        if (!$executed && isEmpty($children->getName())){ 
-	            $array = (string)$xml; 
-	        } 
+		    
+		    $executed = true; 
+      }
+      
+      if (!$executed && isEmpty($children->getName())){ 
+          $array = (string)$xml; 
+      } 
 		}
 		
 		public function __destruct(){
